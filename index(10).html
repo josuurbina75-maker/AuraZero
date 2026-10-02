@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AuraZerø — Cyber Sigilism, Streetwear & Accesorios alternativos. Masaya & Managua, Nicaragua.">
+    <meta name="theme-color" content="#050505">
+    <title>AuraZerø | Cyber Sigilism & Alt Wear</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&family=Permanent+Marker&display=swap"
+        rel="stylesheet">
+    <!-- Supabase (base de datos + fotos + login del admin) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #050505;
+            --bg-2: #0b0b0f;
+            --card: #0e0e13;
+            --card-2: #14141b;
+            --text: #f0f0f5;
+            --muted: #8a8a99;
+            --dim: #4a4a58;
+            --neon: #ff0055;
+            --neon-soft: rgba(255, 0, 85, .45);
+            --blood: #8b0023;
+            --chrome: #c9c9d6;
+            --border: #22222e;
+            --font-sigil: 'UnifrakturMaguntia', cursive;
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --font-tag: 'Permanent Marker', cursive;
+            --gutter: clamp(16px, 5vw, 72px);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+            color: inherit;
+        }
+
+        ::selection {
+            background: var(--neon);
+            color: #fff;
+        }
+
+        /* ───────── CAPAS DE ATMÓSFERA ───────── */
+        #ash {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .grain {
+            position: fixed;
+            inset: -50%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: .07;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            animation: grain 1.2s steps(6) infinite;
+        }
+
+        @keyframes grain {
+            0% { transform: translate(0, 0) }
+            20% { transform: translate(-5%, 3%) }
+            40% { transform: translate(4%, -6%) }
+            60% { transform: translate(-3%, 5%) }
+            80% { transform: translate(6%, 2%) }
+            100% { transform: translate(0, 0) }
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, .75) 100%);
+        }
+
+        main,
+        header,
+        footer,
+        .marquee {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ───────── HEADER ───────── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 14px var(--gutter);
+            background: rgba(5, 5, 5, .82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: var(--font-sigil);
+            font-size: clamp(1.7rem, 5vw, 2.3rem);
+            color: #fff;
+            letter-spacing: 2px;
+            text-decoration: none;
+            animation: flicker 6s infinite;
+            white-space: nowrap;
+        }
+
+        .logo span {
+            color: var(--neon);
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow: 0 0 6px rgba(255, 0, 85, .7), 0 0 18px rgba(255, 0, 85, .35);
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+                opacity: .75;
+            }
+        }
+
+        .social-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .social-btn {
+            color: var(--neon);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: .8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid var(--neon);
+            padding: 7px 12px;
+            transition: background .25s, color .25s, box-shadow .25s;
+            white-space: nowrap;
+        }
+
+        .social-btn:hover,
+        .social-btn:focus-visible {
+            background: var(--neon);
+            color: #fff;
+            box-shadow: 0 0 16px var(--neon-soft);
+            outline: none;
+        }
+
+        .social-btn .short {
+            display: none;
+        }
+
+        /* ───────── HERO ───────── */
+        .hero {
+            position: relative;
+            min-height: min(88vh, 760px);
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 80px var(--gutter) 70px;
+            overflow: hidden;
+        }
+
+        .hero-sigil {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: min(560px, 120vw);
+            transform: translate(-50%, -50%);
+            opacity: .22;
+            pointer-events: none;
+        }
+
+        .hero-sigil path {
+            fill: none;
+            stroke: var(--neon);
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-dasharray: 1400;
+            stroke-dashoffset: 1400;
+            animation: draw 4.5s cubic-bezier(.6, .1, .2, 1) forwards, pulse 5s 4.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 6px var(--neon));
+        }
+
+        .hero-sigil path:nth-child(2n) {
+            animation-delay: .4s, 4.9s;
+        }
+
+        .hero-sigil path:nth-child(3n) {
+            animation-delay: .8s, 5.3s;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .45; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+        }
+
+        .hero-kicker {
+            font-family: var(--font-sigil);
+            font-size: clamp(1.3rem, 3.6vw, 2rem);
+            color: var(--chrome);
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: rise 1s .3s forwards;
+        }
+
+        .glitch {
+            position: relative;
+            font-family: var(--font-head);
+            font-weight: 800;
+            font-size: clamp(2.8rem, 11vw, 7rem);
+            line-height: .92;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            opacity: 0;
+            animation: rise 1s .6s forwards;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .glitch::before {
+            color: var(--neon);
+            transform: translate(3px, 0);
+            mix-blend-mode: screen;
+            animation: glitch-a 3.2s infinite steps(1);
+        }
+
+        .glitch::after {
+            color: #00e5ff;
+            transform: translate(-3px, 0);
+            mix-blend-mode: screen;
+            animation: glitch-b 2.7s infinite steps(1);
+        }
+
+        @keyframes glitch-a {
+            0%, 86%, 100% { clip-path: inset(100% 0 0 0); }
+            88% { clip-path: inset(10% 0 70% 0); }
+            90% { clip-path: inset(55% 0 20% 0); }
+            92% { clip-path: inset(30% 0 50% 0); }
+            94% { clip-path: inset(80% 0 5% 0); }
+        }
+
+        @keyframes glitch-b {
+            0%, 80%, 100% { clip-path: inset(100% 0 0 0); }
+            82% { clip-path: inset(65% 0 15% 0); }
+            85% { clip-path: inset(5% 0 80% 0); }
+            88% { clip-path: inset(40% 0 35% 0); }
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
+            to { opacity: 1; transform: none; filter: none; }
+        }
+
+        .hero-sub {
+            margin: 22px auto 0;
+            color: var(--muted);
+            font-size: clamp(.9rem, 2.4vw, 1.05rem);
+            max-width: 520px;
+            opacity: 0;
+            animation: rise 1s .9s forwards;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 14px 28px;
+            background: var(--neon);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: .85rem;
+            clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+            box-shadow: 0 0 24px var(--neon-soft);
+            opacity: 0;
+            animation: rise 1s 1.2s forwards;
+            transition: transform .2s;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        /* ───────── GRAFITIS ───────── */
+        .tag {
+            position: absolute;
+            font-family: var(--font-tag);
+            color: var(--neon);
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+            text-shadow: 0 0 2px rgba(255, 0, 85, .9), 0 0 14px rgba(255, 0, 85, .45), 2px 2px 0 rgba(0, 0, 0, .8);
+            opacity: 0;
+            animation: spray .9s forwards;
+            z-index: 1;
+        }
+
+        .tag.white {
+            color: #e8e8f0;
+            text-shadow: 0 0 2px rgba(255, 255, 255, .8), 0 0 12px rgba(255, 255, 255, .25), 2px 2px 0 rgba(0, 0, 0, .8);
+        }
+
+        .tag.outline {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--chrome);
+            text-shadow: none;
+        }
+
+        @keyframes spray {
+            0% { opacity: 0; filter: blur(8px); transform: var(--rot) scale(1.15); }
+            100% { opacity: var(--op, .85); filter: blur(0); transform: var(--rot) scale(1); }
+        }
+
+        .t1 { --rot: rotate(-12deg); --op: .8; top: 13%; left: 4%; font-size: clamp(1.4rem, 3.6vw, 2.6rem); animation-delay: 1.6s; }
+        .t2 { --rot: rotate(8deg); --op: .55; top: 18%; right: 5%; font-size: clamp(1rem, 2.4vw, 1.7rem); animation-delay: 1.9s; }
+        .t3 { --rot: rotate(-6deg); --op: .5; bottom: 16%; left: 7%; font-size: clamp(1rem, 2.6vw, 1.9rem); animation-delay: 2.2s; }
+        .t4 { --rot: rotate(10deg); --op: .75; bottom: 12%; right: 6%; font-size: clamp(1.6rem, 4.2vw, 3rem); animation-delay: 2.5s; }
+
+        .drips {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            width: 100%;
+            height: 70px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .drips path {
+            fill: var(--bg);
+        }
+
+        .drip-line {
+            fill: none !important;
+            stroke: var(--neon);
+            stroke-width: 1.5;
+            opacity: .6;
+        }
+
+        /* ───────── MARQUEE ───────── */
+        .marquee {
+            overflow: hidden;
+            border-block: 1px solid var(--border);
+            background: var(--bg-2);
+            padding: 12px 0;
+            transform: rotate(-1.2deg) scale(1.02);
+            margin: 10px 0 30px;
+        }
+
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: scroll 28s linear infinite;
+        }
+
+        .marquee span {
+            font-family: var(--font-head);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: clamp(.9rem, 2.4vw, 1.2rem);
+            letter-spacing: 3px;
+            padding: 0 22px;
+            white-space: nowrap;
+            color: var(--chrome);
+        }
+
+        .marquee span:nth-child(even) {
+            color: var(--neon);
+            font-family: var(--font-sigil);
+            letter-spacing: 1px;
+            text-transform: none;
+            font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+        }
+
+        @keyframes scroll {
+            to { transform: translateX(-50%); }
+        }
+
+        /* ───────── CATÁLOGO ───────── */
+        .catalog {
+            padding: 30px var(--gutter) 80px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 26px;
+        }
+
+        .section-title {
+            font-family: var(--font-head);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            line-height: 1;
+        }
+
+        .section-title small {
+            display: block;
+            font-family: var(--font-sigil);
+            text-transform: none;
+            font-weight: 400;
+            font-size: .55em;
+            color: var(--neon);
+            margin-bottom: 4px;
+        }
+
+        .search {
+            position: relative;
+            flex: 1 1 240px;
+            max-width: 340px;
+        }
+
+        .search input {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 12px 14px 12px 40px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .search input:focus {
+            border-color: var(--neon);
+            box-shadow: 0 0 0 3px rgba(255, 0, 85, .15);
+        }
+
+        .search svg {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            stroke: var(--muted);
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            margin-bottom: 26px;
+            scrollbar-width: none;
+        }
+
+        .chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            flex: none;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 8px 16px;
+            font-size: .8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .chip:hover {
+            color: #fff;
+            border-color: #555;
+        }
+
+        .chip.active {
+            background: var(--neon);
+            border-color: var(--neon);
+            color: #fff;
+            box-shadow: 0 0 14px var(--neon-soft);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, var(--card-2), var(--card));
+            border: 1px solid var(--border);
+            transition: transform .35s cubic-bezier(.2, .8, .2, 1), border-color .35s, box-shadow .35s;
+        }
+
+        .card::before,
+        .card::after {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--neon);
+            opacity: 0;
+            transition: opacity .3s, transform .3s;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .card::before {
+            top: -6px;
+            left: -6px;
+            border-right: 0;
+            border-bottom: 0;
+            transform: translate(6px, 6px);
+        }
+
+        .card::after {
+            bottom: -6px;
+            right: -6px;
+            border-left: 0;
+            border-top: 0;
+            transform: translate(-6px, -6px);
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 0, 85, .5);
+            box-shadow: 0 18px 40px -12px rgba(255, 0, 85, .35);
+        }
+
+        .card:hover::before,
+        .card:hover::after {
+            opacity: 1;
+            transform: none;
+        }
+
+        .card-media {
+            position: relative;
+            aspect-ratio: 4 / 5;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .card-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .6s cubic-bezier(.2, .8, .2, 1), filter .6s;
+            filter: grayscale(.25) contrast(1.05);
+        }
+
+        .card:hover .card-media img {
+            transform: scale(1.06);
+            filter: grayscale(0) contrast(1.1);
+        }
+
+        .card-media::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(5, 5, 5, .85));
+            pointer-events: none;
+        }
+
+        .badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            background: var(--neon);
+            color: #fff;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 5px 9px;
+            box-shadow: 0 0 12px rgba(255, 0, 85, .6);
+            animation: badge 2.4s ease-in-out infinite;
+        }
+
+        @keyframes badge {
+            0%, 100% { box-shadow: 0 0 8px rgba(255, 0, 85, .5); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 85, .9); }
+        }
+
+        .sold {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            background: rgba(0, 0, 0, .6);
+            font-family: var(--font-tag);
+            font-size: 1.7rem;
+            color: var(--neon);
+            transform: rotate(-8deg);
+            text-shadow: 0 0 12px var(--neon-soft);
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 16px;
+            flex: 1;
+        }
+
+        .type-tag {
+            font-size: .7rem;
+            color: var(--neon);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .card-body h3 {
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .card-desc {
+            color: var(--muted);
+            font-size: .85rem;
+            line-height: 1.45;
+        }
+
+        .price {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+            margin: 6px 0 12px;
+        }
+
+        .price-old {
+            font-size: .85rem;
+            color: var(--dim);
+            text-decoration: line-through;
+        }
+
+        .price-final {
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .btn-wa {
+            margin-top: auto;
+            width: 100%;
+            padding: 13px 10px;
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            font-weight: 700;
+            font-size: .8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color .3s, border-color .3s;
+            z-index: 0;
+        }
+
+        .btn-wa::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: var(--neon);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .35s cubic-bezier(.7, 0, .2, 1);
+            z-index: -1;
+        }
+
+        .btn-wa:hover::before,
+        .btn-wa:focus-visible::before {
+            transform: scaleX(1);
+        }
+
+        .btn-wa:hover,
+        .btn-wa:focus-visible {
+            border-color: var(--neon);
+            outline: none;
+        }
+
+        .btn-wa:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .btn-wa:disabled::before {
+            display: none;
+        }
+
+        /* aparición al hacer scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: none;
+            transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1);
+            transition-delay: var(--d, 0s);
+        }
+
+        /* skeletons */
+        .skeleton {
+            border: 1px solid var(--border);
+            background: var(--card);
+        }
+
+        .skeleton .sk-img {
+            aspect-ratio: 4 / 5;
+        }
+
+        .skeleton .sk-line {
+            height: 12px;
+            margin: 14px 16px;
+        }
+
+        .skeleton .sk-line.short {
+            width: 50%;
+        }
+
+        .sk-img,
+        .sk-line {
+            background: linear-gradient(90deg, #111 0%, #1c1c24 50%, #111 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+
+        @keyframes shimmer {
+            to { background-position: -200% 0; }
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty strong {
+            display: block;
+            font-family: var(--font-tag);
+            font-size: 2rem;
+            color: var(--neon);
+            margin-bottom: 8px;
+            transform: rotate(-3deg);
+        }
+
+        /* ───────── FOOTER ───────── */
+        footer {
+            padding: 60px var(--gutter) 40px;
+            text-align: center;
+            color: var(--dim);
+            font-size: .85rem;
+            border-top: 1px solid var(--border);
+            background: linear-gradient(180deg, transparent, rgba(139, 0, 35, .08));
+        }
+
+        .footer-logo {
+            font-family: var(--font-sigil);
+            font-size: 2.6rem;
+            color: var(--chrome);
+            margin-bottom: 18px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px 26px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: .8rem;
+            transition: color .2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--neon);
+        }
+
+        .admin-trigger {
+            margin-top: 18px;
+            background: none;
+            border: 0;
+            color: #2a2a33;
+            font-size: .75rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .admin-trigger:hover {
+            color: #666;
+        }
+
+        /* WhatsApp flotante */
+        .fab {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 40;
+            display: grid;
+            place-items: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--neon);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: .8rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 0 0 rgba(255, 0, 85, .6);
+            animation: ring 2.4s infinite;
+        }
+
+        @keyframes ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, .55); }
+            70% { box-shadow: 0 0 0 18px rgba(255, 0, 85, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+        }
+
+        /* ───────── PANEL ADMIN ───────── */
+        dialog.admin {
+            margin: auto;
+            width: min(760px, calc(100% - 24px));
+            max-height: calc(100dvh - 24px);
+            background: #07070a;
+            color: var(--text);
+            border: 1px solid var(--neon);
+            box-shadow: 0 0 40px rgba(255, 0, 85, .35);
+            padding: 0;
+        }
+
+        dialog.admin::backdrop {
+            background: rgba(0, 0, 0, .75);
+            backdrop-filter: blur(4px);
+        }
+
+        .admin-head {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #07070a;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-head h4 {
+            font-family: var(--font-sigil);
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--neon);
+        }
+
+        .icon-btn {
+            background: none;
+            border: 1px solid var(--border);
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--neon);
+            color: var(--neon);
+        }
+
+        .admin-body {
+            padding: 20px;
+        }
+
+        .notice {
+            border: 1px dashed var(--neon);
+            padding: 12px 14px;
+            font-size: .85rem;
+            color: var(--chrome);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+        }
+
+        .field input,
+        .field textarea {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 11px 12px;
+            outline: none;
+            width: 100%;
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: var(--neon);
+        }
+
+        .check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--chrome);
+            cursor: pointer;
+        }
+
+        .check input {
+            accent-color: var(--neon);
+            width: 18px;
+            height: 18px;
+        }
+
+        .preview {
+            width: 90px;
+            aspect-ratio: 4/5;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .preview.show {
+            display: block;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: 1px solid var(--neon);
+            background: var(--neon);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: .8rem;
+            cursor: pointer;
+            transition: filter .2s;
+        }
+
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: wait;
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--chrome);
+            border-color: #333;
+        }
+
+        .btn.ghost:hover {
+            border-color: var(--neon);
+            color: var(--neon);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-list {
+            margin-top: 26px;
+            border-top: 1px solid var(--border);
+            padding-top: 18px;
+        }
+
+        .admin-list h5 {
+            font-family: var(--font-head);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 52px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #15151c;
+        }
+
+        .row img {
+            width: 52px;
+            height: 64px;
+            object-fit: cover;
+            background: #111;
+        }
+
+        .row-info {
+            min-width: 0;
+        }
+
+        .row-info strong {
+            display: block;
+            font-size: .9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .row-info span {
+            font-size: .75rem;
+            color: var(--muted);
+        }
+
+        .pill {
+            display: inline-block;
+            font-size: .65rem;
+            padding: 2px 6px;
+            border: 1px solid var(--dim);
+            margin-left: 4px;
+            text-transform: uppercase;
+        }
+
+        .pill.off {
+            border-color: var(--neon);
+            color: var(--neon);
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .mini {
+            background: transparent;
+            border: 1px solid #333;
+            padding: 6px 9px;
+            font-size: .7rem;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .mini:hover {
+            border-color: var(--chrome);
+        }
+
+        .mini.danger {
+            border-color: rgba(255, 0, 85, .5);
+            color: var(--neon);
+        }
+
+        .mini.danger:hover {
+            background: var(--neon);
+            color: #fff;
+        }
+
+        /* toast */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            z-index: 1000;
+            transform: translate(-50%, 140%);
+            background: #000;
+            border: 1px solid var(--neon);
+            color: #fff;
+            padding: 12px 18px;
+            font-size: .9rem;
+            box-shadow: 0 0 20px rgba(255, 0, 85, .4);
+            transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+            max-width: calc(100% - 32px);
+            text-align: center;
+        }
+
+        .toast.show {
+            transform: translate(-50%, 0);
+        }
+
+        /* ───────── RESPONSIVE ───────── */
+        @media (max-width: 720px) {
+            .social-btn .full { display: none; }
+            .social-btn .short { display: inline; }
+            .social-btn { padding: 7px 10px; }
+            .t2, .t3 { display: none; }
+            .hero { min-height: 78vh; padding-top: 60px; }
+            .section-head { align-items: stretch; flex-direction: column; }
+            .search { max-width: none; }
+        }
+
+        @media (max-width: 560px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .card-body { padding: 12px; gap: 4px; }
+            .card-body h3 { font-size: .95rem; }
+            .card-desc { display: none; }
+            .price-final { font-size: 1.1rem; }
+            .btn-wa { padding: 11px 6px; font-size: .7rem; letter-spacing: .5px; }
+            .badge { top: 8px; left: 8px; font-size: .65rem; padding: 4px 6px; }
+            .sold { font-size: 1.2rem; }
+            .form { grid-template-columns: 1fr; }
+            .row { grid-template-columns: 44px 1fr; }
+            .row img { width: 44px; height: 54px; }
+            .row-actions { grid-column: 1 / -1; justify-content: flex-start; }
+            .fab { width: 50px; height: 50px; right: 14px; bottom: 14px; }
+        }
+
+        @media (max-width: 360px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .001ms !important;
+            }
+            .reveal { opacity: 1; transform: none; }
+            .marquee-track { animation: none; }
+            #ash { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="ash" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- ═════════ HEADER ═════════ -->
+    <header>
+        <a href="#" class="logo">Aura<span>Z</span>erø</a>
+        <nav class="social-nav" aria-label="Redes sociales">
+            <a href="https://www.facebook.com/profile.php?id=61588207611650" target="_blank" rel="noopener"
+                class="social-btn"><span class="full">Facebook</span><span class="short">FB</span></a>
+            <a href="https://www.instagram.com/aurazero_store/" target="_blank" rel="noopener"
+                class="social-btn"><span class="full">Instagram</span><span class="short">IG</span></a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- ═════════ HERO ═════════ -->
+        <section class="hero">
+            <svg class="hero-sigil" viewBox="0 0 400 520" aria-hidden="true">
+                <path d="M200 20 C196 140 204 300 200 500" />
+                <path d="M200 90 C160 100 120 80 90 40 C110 90 80 130 40 150" />
+                <path d="M200 90 C240 100 280 80 310 40 C290 90 320 130 360 150" />
+                <path d="M200 190 C150 190 100 220 70 280 C60 250 40 240 15 245" />
+                <path d="M200 190 C250 190 300 220 330 280 C340 250 360 240 385 245" />
+                <path d="M200 280 C170 300 150 340 160 390 C140 380 120 390 110 420" />
+                <path d="M200 280 C230 300 250 340 240 390 C260 380 280 390 290 420" />
+                <path d="M200 140 C185 150 175 165 178 185 M200 140 C215 150 225 165 222 185" />
+                <path d="M200 380 C190 410 180 440 160 470 M200 380 C210 410 220 440 240 470" />
+            </svg>
+
+            <span class="tag t1">alt forever</span>
+            <span class="tag white t2">505 ✝ NIC</span>
+            <span class="tag outline t3">no rules</span>
+            <span class="tag t4">ZERØ</span>
+
+            <div class="hero-content">
+                <p class="hero-kicker">Cyber Sigilism · Alt Wear</p>
+                <h1 class="glitch" data-text="Drops & Alt Wear">Drops &amp; Alt Wear</h1>
+                <p class="hero-sub">Streetwear oscuro, accesorios y piezas únicas para los que no encajan.
+                    Masaya &amp; Managua.</p>
+                <a href="#catalogo" class="hero-cta">Ver el drop ↓</a>
+            </div>
+
+            <svg class="drips" viewBox="0 0 1200 70" preserveAspectRatio="none" aria-hidden="true">
+                <path
+                    d="M0 70 L0 38 Q60 30 110 36 L118 36 Q122 62 128 36 Q240 26 330 34 L338 34 Q342 52 348 34 Q470 30 560 40 L566 40 Q571 68 577 40 Q700 28 820 34 L826 34 Q830 56 836 34 Q960 30 1060 38 L1066 38 Q1070 60 1075 38 Q1140 34 1200 36 L1200 70 Z" />
+                <path class="drip-line"
+                    d="M0 38 Q60 30 110 36 L118 36 Q122 62 128 36 Q240 26 330 34 L338 34 Q342 52 348 34 Q470 30 560 40 L566 40 Q571 68 577 40 Q700 28 820 34 L826 34 Q830 56 836 34 Q960 30 1060 38 L1066 38 Q1070 60 1075 38 Q1140 34 1200 36" />
+            </svg>
+        </section>
+
+        <!-- ═════════ MARQUEE ═════════ -->
+        <div class="marquee" aria-hidden="true">
+            <div class="marquee-track" id="marquee"></div>
+        </div>
+
+        <!-- ═════════ CATÁLOGO ═════════ -->
+        <section class="catalog" id="catalogo">
+            <div class="section-head">
+                <h2 class="section-title"><small>el catálogo</small>Último Drop</h2>
+                <label class="search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M20 20l-3.5-3.5" />
+                    </svg>
+                    <input type="search" id="search" placeholder="Buscar tees, anillos, cinturones…"
+                        aria-label="Buscar productos">
+                </label>
+            </div>
+            <div class="chips" id="chips" role="tablist" aria-label="Categorías"></div>
+            <div class="grid" id="grid" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <!-- ═════════ FOOTER ═════════ -->
+    <footer>
+        <div class="footer-logo">AuraZerø</div>
+        <div class="footer-links">
+            <a href="https://www.facebook.com/profile.php?id=61588207611650" target="_blank" rel="noopener">Facebook</a>
+            <a href="https://www.instagram.com/aurazero_store/" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://wa.me/50586767895" target="_blank" rel="noopener">WhatsApp Directo</a>
+        </div>
+        <p>AuraZerø Store © <span id="year">2026</span> — Nicaragua</p>
+        <button class="admin-trigger" id="adminTrigger" type="button">[Acceso Admin]</button>
+    </footer>
+
+    <a class="fab" href="https://wa.me/50586767895" target="_blank" rel="noopener"
+        aria-label="Escribir por WhatsApp">WA</a>
+
+    <!-- ═════════ PANEL ADMIN ═════════ -->
+    <dialog class="admin" id="admin">
+        <div class="admin-head">
+            <h4>Panel Propietario</h4>
+            <button class="icon-btn" type="button" data-close aria-label="Cerrar">✕</button>
+        </div>
+        <div class="admin-body">
+            <!-- Login -->
+            <div id="loginView">
+                <div class="notice" id="demoNotice" hidden>
+                    <strong>Modo demo:</strong> todavía no conectaste Supabase. Pon tu <code>SUPABASE_URL</code> y
+                    <code>SUPABASE_ANON_KEY</code> en el script (línea de CONFIG) para activar el panel.
+                </div>
+                <form id="loginForm" class="form">
+                    <div class="field full">
+                        <label for="email">Correo</label>
+                        <input type="email" id="email" autocomplete="username" required>
+                    </div>
+                    <div class="field full">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" autocomplete="current-password" required>
+                    </div>
+                    <div class="field full">
+                        <button class="btn" type="submit" id="loginBtn">Entrar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Panel -->
+            <div id="panelView" hidden>
+                <form id="productForm" class="form">
+                    <input type="hidden" id="pId">
+                    <div class="field full">
+                        <label for="pName">Nombre del producto *</label>
+                        <input type="text" id="pName" maxlength="120" required>
+                    </div>
+                    <div class="field">
+                        <label for="pType">Tipo</label>
+                        <input type="text" id="pType" maxlength="40" placeholder="Tee, Ring, Belt…" list="typeList">
+                        <datalist id="typeList"></datalist>
+                    </div>
+                    <div class="field">
+                        <label for="pPrice">Precio base (C$) *</label>
+                        <input type="number" id="pPrice" min="0" step="1" required>
+                    </div>
+                    <div class="field">
+                        <label for="pDiscount">% descuento (0–90)</label>
+                        <input type="number" id="pDiscount" min="0" max="90" step="1" value="0">
+                    </div>
+                    <div class="field">
+                        <label for="pOrder">Orden (menor = primero)</label>
+                        <input type="number" id="pOrder" step="1" value="0">
+                    </div>
+                    <div class="field full">
+                        <label for="pDesc">Descripción (opcional)</label>
+                        <textarea id="pDesc" maxlength="300" placeholder="Talla, material, detalles…"></textarea>
+                    </div>
+                    <div class="field full">
+                        <label for="pFile">Foto <span id="fileHint">*</span></label>
+                        <input type="file" id="pFile" accept="image/*">
+                        <img class="preview" id="preview" alt="Vista previa">
+                    </div>
+                    <div class="field">
+                        <label class="check"><input type="checkbox" id="pStock" checked> Hay stock</label>
+                    </div>
+                    <div class="field">
+                        <label class="check"><input type="checkbox" id="pActive" checked> Visible en la tienda</label>
+                    </div>
+                    <div class="field full btn-row">
+                        <button class="btn" type="submit" id="saveBtn">Publicar en la tienda</button>
+                        <button class="btn ghost" type="button" id="cancelEdit" hidden>Cancelar edición</button>
+                        <button class="btn ghost" type="button" id="logoutBtn">Cerrar sesión</button>
+                    </div>
+                </form>
+
+                <div class="admin-list">
+                    <h5>Productos (<span id="count">0</span>)</h5>
+                    <div id="adminRows"></div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+        /* ═══════════════ CONFIG ═══════════════
+           1. Crea un proyecto en https://supabase.com
+           2. Corre el archivo aurazero_schema.sql en el SQL Editor
+           3. Pega aquí la URL y la "anon public key" (Project Settings → API)
+           Sin esto, la página funciona en modo demo con productos de muestra. */
+        const SUPABASE_URL = "https://nagzijqlszsrsvqqzbuu.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_ptzFmGS-C4OVDra3k9VvxQ_VpP6kwtY";
+        const PHONE = "50586767895";
+        const BUCKET = "products";
+
+        const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+            : null;
+
+        /* ═══════════════ ESTADO ═══════════════ */
+        const state = {
+            products: [],
+            filter: "Todo",
+            query: "",
+            isAdmin: false,
+            imageBlob: null
+        };
+
+        const $ = (s) => document.querySelector(s);
+
+        /* Escapa texto antes de meterlo al HTML (fix XSS / comillas) */
+        function esc(str) {
+            return String(str ?? "").replace(/[&<>"']/g, (c) => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            })[c]);
+        }
+
+        function finalPrice(p) {
+            const d = Math.min(Math.max(parseInt(p.discount) || 0, 0), 90);
+            return d > 0 ? Math.round(Number(p.price) * (100 - d) / 100) : Math.round(Number(p.price));
+        }
+
+        const money = (n) => "C$ " + Number(n).toLocaleString("es-NI");
+
+        function toast(msg) {
+            const t = $("#toast");
+            t.textContent = msg;
+            t.classList.add("show");
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => t.classList.remove("show"), 2800);
+        }
+
+        /* Placeholder propio (reemplaza via.placeholder.com que ya no existe) */
+        function placeholder(label) {
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'>
+                <rect width='400' height='500' fill='#0a0a0e'/>
+                <g fill='none' stroke='#ff0055' stroke-width='2' opacity='.55'>
+                  <path d='M200 60 L200 440 M200 120 C150 130 120 110 90 70 M200 120 C250 130 280 110 310 70 M200 230 C140 230 100 270 80 330 M200 230 C260 230 300 270 320 330'/>
+                </g>
+                <text x='200' y='470' fill='#8a8a99' font-family='sans-serif' font-size='18' text-anchor='middle'>${label.replace(/[<&'"]/g, "")}</text>
+            </svg>`;
+            return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+        }
+
+        const DEMO = [
+            { id: "demo-1", name: "Tee Cyber Sigil Wings", type: "Oversized Tee", description: "Algodón pesado, estampado frontal y trasero.", price: 550, discount: 15, in_stock: true, is_active: true, image_url: placeholder("Cyber Tee") },
+            { id: "demo-2", name: "Bullet & Studded Belt", type: "Cinturón", description: "Cuero sintético con tachas metálicas.", price: 450, discount: 0, in_stock: true, is_active: true, image_url: placeholder("Bullet Belt") },
+            { id: "demo-3", name: "Thorn Ring Chrome", type: "Anillo", description: "Acero inoxidable, ajustable.", price: 280, discount: 10, in_stock: true, is_active: true, image_url: placeholder("Thorn Ring") },
+            { id: "demo-4", name: "Hoodie Gothic Script", type: "Hoodie", description: "Letras góticas bordadas.", price: 980, discount: 0, in_stock: false, is_active: true, image_url: placeholder("Gothic Hoodie") }
+        ];
+
+        /* ═══════════════ DATOS ═══════════════ */
+        async function fetchProducts() {
+            if (!sb) return DEMO;
+            const { data, error } = await sb
+                .from("products")
+                .select("*")
+                .order("sort_order", { ascending: true })
+                .order("created_at", { ascending: false });
+            if (error) {
+                console.error(error);
+                toast("No se pudo cargar el catálogo 💀");
+                return [];
+            }
+            return data;
+        }
+
+        async function refresh() {
+            state.products = await fetchProducts();
+            renderChips();
+            renderGrid();
+            if (state.isAdmin) renderAdminRows();
+        }
+
+        /* ═══════════════ RENDER PÚBLICO ═══════════════ */
+        function visibleProducts() {
+            const q = state.query.trim().toLowerCase();
+            return state.products.filter((p) =>
+                p.is_active &&
+                (state.filter === "Todo" || p.type === state.filter) &&
+                (!q || `${p.name} ${p.type} ${p.description || ""}`.toLowerCase().includes(q))
+            );
+        }
+
+        function renderChips() {
+            const types = ["Todo", ...new Set(state.products.filter((p) => p.is_active).map((p) => p.type).filter(Boolean))];
+            if (!types.includes(state.filter)) state.filter = "Todo";
+            $("#chips").innerHTML = types.map((t) =>
+                `<button class="chip${t === state.filter ? " active" : ""}" role="tab" aria-selected="${t === state.filter}" data-type="${esc(t)}">${esc(t)}</button>`
+            ).join("");
+            $("#typeList").innerHTML = types.slice(1).map((t) => `<option value="${esc(t)}">`).join("");
+        }
+
+        function renderSkeletons(n = 4) {
+            $("#grid").innerHTML = Array.from({ length: n }, () =>
+                `<div class="skeleton"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>`
+            ).join("");
+        }
+
+        function renderGrid() {
+            const items = visibleProducts();
+            const grid = $("#grid");
+
+            if (!items.length) {
+                grid.innerHTML = `<div class="empty"><strong>vacío…</strong>No hay productos aquí todavía. Vuelve pronto para el próximo drop.</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map((p, i) => {
+                const d = parseInt(p.discount) || 0;
+                const fp = finalPrice(p);
+                return `
+                <article class="card reveal" style="--d:${(i % 4) * 0.08}s">
+                    <div class="card-media">
+                        ${d > 0 ? `<span class="badge">-${d}%</span>` : ""}
+                        ${!p.in_stock ? `<span class="sold">agotado</span>` : ""}
+                        <img src="${esc(p.image_url || placeholder(p.name))}" alt="${esc(p.name)}" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <span class="type-tag">${esc(p.type)}</span>
+                        <h3>${esc(p.name)}</h3>
+                        ${p.description ? `<p class="card-desc">${esc(p.description)}</p>` : ""}
+                        <div class="price">
+                            ${d > 0 ? `<span class="price-old">${money(p.price)}</span>` : ""}
+                            <span class="price-final">${money(fp)}</span>
+                        </div>
+                        <button class="btn-wa" data-order="${esc(p.id)}" ${p.in_stock ? "" : "disabled"}>
+                            ${p.in_stock ? "Pedir por WhatsApp" : "Agotado"}
+                        </button>
+                    </div>
+                </article>`;
+            }).join("");
+
+            observeReveal();
+        }
+
+        let revealObserver;
+        function observeReveal() {
+            if (!("IntersectionObserver" in window)) {
+                document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+                return;
+            }
+            revealObserver ??= new IntersectionObserver((entries) => {
+                entries.forEach((e) => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add("in");
+                        revealObserver.unobserve(e.target);
+                    }
+                });
+            }, { threshold: .12 });
+            document.querySelectorAll(".reveal:not(.in)").forEach((el) => revealObserver.observe(el));
+        }
+
+        function orderWhatsApp(id) {
+            const p = state.products.find((x) => String(x.id) === String(id));
+            if (!p) return;
+            const d = parseInt(p.discount) || 0;
+            let msg = `¡Hola AuraZerø! 🖤 Me interesa: ${p.name} (${money(finalPrice(p))})`;
+            if (d > 0) msg += ` — aprovechando el ${d}% OFF 🔥`;
+            window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+        }
+
+        /* ═══════════════ ADMIN ═══════════════ */
+        const dialog = $("#admin");
+
+        function openAdmin() {
+            $("#demoNotice").hidden = !!sb;
+            showAdminView();
+            if (typeof dialog.showModal === "function") dialog.showModal();
+            else dialog.setAttribute("open", "");
+        }
+
+        function closeAdmin() {
+            dialog.close ? dialog.close() : dialog.removeAttribute("open");
+            if (location.hash === "#admin") history.replaceState(null, "", location.pathname);
+        }
+
+        function showAdminView() {
+            $("#loginView").hidden = state.isAdmin;
+            $("#panelView").hidden = !state.isAdmin;
+            if (state.isAdmin) renderAdminRows();
+        }
+
+        async function checkAdmin() {
+            if (!sb) return false;
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return false;
+            const { data, error } = await sb.from("admins").select("user_id").eq("user_id", session.user.id).maybeSingle();
+            if (error) {
+                console.error("Error leyendo admins:", error);
+                toast("Error de base de datos: " + error.message);
+            } else if (!data) {
+                console.warn("Este usuario no está en public.admins. UID:", session.user.id);
+            }
+            return !!data;
+        }
+
+        async function login(e) {
+            e.preventDefault();
+            if (!sb) { toast("Primero conecta Supabase (ver CONFIG)."); return; }
+            const btn = $("#loginBtn");
+            btn.disabled = true;
+            const { error } = await sb.auth.signInWithPassword({
+                email: $("#email").value.trim(),
+                password: $("#password").value
+            });
+            btn.disabled = false;
+            if (error) { toast("Correo o contraseña incorrectos."); return; }
+            state.isAdmin = await checkAdmin();
+            if (!state.isAdmin) {
+                await sb.auth.signOut();
+                toast("Esa cuenta no tiene permisos de admin.");
+                return;
+            }
+            $("#password").value = "";
+            await refresh();
+            showAdminView();
+            toast("Bienvenido de vuelta 🖤");
+        }
+
+        async function logout() {
+            if (sb) await sb.auth.signOut();
+            state.isAdmin = false;
+            resetForm();
+            await refresh();
+            showAdminView();
+        }
+
+        /* Comprime la foto (máx 1200px, WebP) para que cargue rápido */
+        async function compressImage(file) {
+            const bitmap = await createImageBitmap(file);
+            const max = 1200;
+            const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(bitmap.width * scale);
+            canvas.height = Math.round(bitmap.height * scale);
+            canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+            bitmap.close?.();
+            return new Promise((res, rej) =>
+                canvas.toBlob((b) => b ? res(b) : rej(new Error("No se pudo procesar la imagen")), "image/webp", .82)
+            );
+        }
+
+        async function onFileChange(e) {
+            const file = e.target.files[0];
+            state.imageBlob = null;
+            if (!file) return;
+            if (!file.type.startsWith("image/")) { toast("Eso no es una imagen."); e.target.value = ""; return; }
+            try {
+                state.imageBlob = await compressImage(file);
+                const prev = $("#preview");
+                prev.src = URL.createObjectURL(state.imageBlob);
+                prev.classList.add("show");
+            } catch (err) {
+                console.error(err);
+                toast("No se pudo leer la foto, prueba con otra.");
+                e.target.value = "";
+            }
+        }
+
+        async function uploadImage(blob) {
+            const path = `${crypto.randomUUID()}.webp`;
+            const { error } = await sb.storage.from(BUCKET).upload(path, blob, {
+                contentType: "image/webp",
+                cacheControl: "31536000"
+            });
+            if (error) throw error;
+            const { data } = sb.storage.from(BUCKET).getPublicUrl(path);
+            return { image_url: data.publicUrl, image_path: path };
+        }
+
+        async function saveProduct(e) {
+            e.preventDefault();
+            if (!sb || !state.isAdmin) return;
+
+            const id = $("#pId").value;
+            const name = $("#pName").value.trim();
+            const price = parseFloat($("#pPrice").value);
+            const discount = Math.min(Math.max(parseInt($("#pDiscount").value) || 0, 0), 90);
+
+            if (!name || isNaN(price) || price < 0) { toast("Completa nombre y precio válido."); return; }
+            if (!id && !state.imageBlob) { toast("Adjunta una foto del producto."); return; }
+
+            const btn = $("#saveBtn");
+            btn.disabled = true;
+            btn.textContent = "Subiendo…";
+
+            try {
+                const row = {
+                    name,
+                    type: $("#pType").value.trim() || "Accesorio",
+                    description: $("#pDesc").value.trim() || null,
+                    price,
+                    discount,
+                    sort_order: parseInt($("#pOrder").value) || 0,
+                    in_stock: $("#pStock").checked,
+                    is_active: $("#pActive").checked
+                };
+
+                let oldPath = null;
+                if (state.imageBlob) {
+                    if (id) oldPath = state.products.find((p) => String(p.id) === id)?.image_path;
+                    Object.assign(row, await uploadImage(state.imageBlob));
+                }
+
+                const { error } = id
+                    ? await sb.from("products").update(row).eq("id", id)
+                    : await sb.from("products").insert(row);
+                if (error) throw error;
+
+                if (oldPath) await sb.storage.from(BUCKET).remove([oldPath]);
+
+                toast(id ? "Producto actualizado ✝" : "¡Producto publicado! 🔥");
+                resetForm();
+                await refresh();
+            } catch (err) {
+                console.error(err);
+                toast("Error al guardar: " + (err.message || "intenta de nuevo"));
+            } finally {
+                btn.disabled = false;
+                btn.textContent = $("#pId").value ? "Guardar cambios" : "Publicar en la tienda";
+            }
+        }
+
+        function resetForm() {
+            $("#productForm").reset();
+            $("#pId").value = "";
+            $("#pDiscount").value = 0;
+            $("#pOrder").value = 0;
+            state.imageBlob = null;
+            $("#preview").classList.remove("show");
+            $("#saveBtn").textContent = "Publicar en la tienda";
+            $("#cancelEdit").hidden = true;
+            $("#fileHint").textContent = "*";
+        }
+
+        function editProduct(id) {
+            const p = state.products.find((x) => String(x.id) === String(id));
+            if (!p) return;
+            $("#pId").value = p.id;
+            $("#pName").value = p.name;
+            $("#pType").value = p.type || "";
+            $("#pPrice").value = p.price;
+            $("#pDiscount").value = p.discount || 0;
+            $("#pOrder").value = p.sort_order || 0;
+            $("#pDesc").value = p.description || "";
+            $("#pStock").checked = p.in_stock;
+            $("#pActive").checked = p.is_active;
+            state.imageBlob = null;
+            $("#pFile").value = "";
+            const prev = $("#preview");
+            prev.src = p.image_url || placeholder(p.name);
+            prev.classList.add("show");
+            $("#saveBtn").textContent = "Guardar cambios";
+            $("#cancelEdit").hidden = false;
+            $("#fileHint").textContent = "(déjala vacía para conservar la actual)";
+            dialog.querySelector(".admin-body").scrollTo?.({ top: 0, behavior: "smooth" });
+            dialog.scrollTo?.({ top: 0, behavior: "smooth" });
+        }
+
+        async function toggleField(id, field) {
+            const p = state.products.find((x) => String(x.id) === String(id));
+            if (!p) return;
+            const { error } = await sb.from("products").update({ [field]: !p[field] }).eq("id", id);
+            if (error) { toast("No se pudo actualizar."); return; }
+            await refresh();
+        }
+
+        async function deleteProduct(id) {
+            const p = state.products.find((x) => String(x.id) === String(id));
+            if (!p || !confirm(`¿Eliminar "${p.name}" para siempre?`)) return;
+            const { error } = await sb.from("products").delete().eq("id", id);
+            if (error) { toast("No se pudo eliminar."); return; }
+            if (p.image_path) await sb.storage.from(BUCKET).remove([p.image_path]);
+            if ($("#pId").value === String(id)) resetForm();
+            toast("Producto eliminado 🪦");
+            await refresh();
+        }
+
+        function renderAdminRows() {
+            $("#count").textContent = state.products.length;
+            $("#adminRows").innerHTML = state.products.map((p) => `
+                <div class="row">
+                    <img src="${esc(p.image_url || placeholder(p.name))}" alt="">
+                    <div class="row-info">
+                        <strong>${esc(p.name)}</strong>
+                        <span>${esc(p.type)} · ${money(finalPrice(p))}${p.discount > 0 ? ` (-${p.discount}%)` : ""}</span>
+                        ${!p.is_active ? `<span class="pill off">oculto</span>` : ""}
+                        ${!p.in_stock ? `<span class="pill off">agotado</span>` : ""}
+                    </div>
+                    <div class="row-actions">
+                        <button class="mini" data-edit="${esc(p.id)}">Editar</button>
+                        <button class="mini" data-toggle="in_stock" data-id="${esc(p.id)}">${p.in_stock ? "Marcar agotado" : "Hay stock"}</button>
+                        <button class="mini" data-toggle="is_active" data-id="${esc(p.id)}">${p.is_active ? "Ocultar" : "Mostrar"}</button>
+                        <button class="mini danger" data-delete="${esc(p.id)}">Eliminar</button>
+                    </div>
+                </div>`).join("") || `<p class="card-desc">Aún no hay productos. ¡Sube el primero!</p>`;
+        }
+
+        /* ═══════════════ CENIZA (canvas) ═══════════════ */
+        function startAsh() {
+            if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            const c = $("#ash");
+            const ctx = c.getContext("2d");
+            let w, h, particles = [], raf;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            function resize() {
+                w = c.width = innerWidth * dpr;
+                h = c.height = innerHeight * dpr;
+                c.style.width = innerWidth + "px";
+                c.style.height = innerHeight + "px";
+                const count = innerWidth < 600 ? 28 : 55;
+                particles = Array.from({ length: count }, () => spawn(true));
+            }
+
+            function spawn(anywhere) {
+                const ember = Math.random() < .25;
+                return {
+                    x: Math.random() * w,
+                    y: anywhere ? Math.random() * h : h + 10,
+                    r: (Math.random() * 1.6 + .4) * dpr,
+                    vy: -(Math.random() * .35 + .12) * dpr,
+                    vx: (Math.random() - .5) * .2 * dpr,
+                    sway: Math.random() * Math.PI * 2,
+                    a: Math.random() * .5 + .15,
+                    color: ember ? "255,0,85" : "200,200,214"
+                };
+            }
+
+            function tick() {
+                ctx.clearRect(0, 0, w, h);
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.sway += .01;
+                    p.x += p.vx + Math.sin(p.sway) * .25 * dpr;
+                    p.y += p.vy;
+                    if (p.y < -10) particles[i] = spawn(false);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${p.color},${p.a})`;
+                    ctx.fill();
+                }
+                raf = requestAnimationFrame(tick);
+            }
+
+            resize();
+            tick();
+            addEventListener("resize", resize);
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) cancelAnimationFrame(raf);
+                else tick();
+            });
+        }
+
+        /* ═══════════════ MARQUEE ═══════════════ */
+        function buildMarquee() {
+            const words = ["New Drop", "Cyber Sigil", "Alt Wear", "Streetwear", "Masaya", "Managua", "Accesorios", "Dark Mode Only"];
+            const html = words.map((w) => `<span>${w}</span><span>✝</span>`).join("");
+            $("#marquee").innerHTML = html + html;
+        }
+
+        /* ═══════════════ EVENTOS ═══════════════ */
+        $("#grid").addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-order]");
+            if (btn) orderWhatsApp(btn.dataset.order);
+        });
+
+        $("#chips").addEventListener("click", (e) => {
+            const chip = e.target.closest("[data-type]");
+            if (!chip) return;
+            state.filter = chip.dataset.type;
+            renderChips();
+            renderGrid();
+        });
+
+        let searchT;
+        $("#search").addEventListener("input", (e) => {
+            clearTimeout(searchT);
+            searchT = setTimeout(() => { state.query = e.target.value; renderGrid(); }, 150);
+        });
+
+        $("#adminRows").addEventListener("click", (e) => {
+            const t = e.target;
+            if (t.dataset.edit) editProduct(t.dataset.edit);
+            else if (t.dataset.toggle) toggleField(t.dataset.id, t.dataset.toggle);
+            else if (t.dataset.delete) deleteProduct(t.dataset.delete);
+        });
+
+        $("#adminTrigger").addEventListener("click", openAdmin);
+        dialog.querySelector("[data-close]").addEventListener("click", closeAdmin);
+        dialog.addEventListener("click", (e) => { if (e.target === dialog) closeAdmin(); });
+        $("#loginForm").addEventListener("submit", login);
+        $("#productForm").addEventListener("submit", saveProduct);
+        $("#pFile").addEventListener("change", onFileChange);
+        $("#cancelEdit").addEventListener("click", resetForm);
+        $("#logoutBtn").addEventListener("click", logout);
+
+        /* ═══════════════ INICIO ═══════════════ */
+        (async function init() {
+            $("#year").textContent = new Date().getFullYear();
+            buildMarquee();
+            startAsh();
+            renderSkeletons();
+            state.isAdmin = await checkAdmin();
+            await refresh();
+            if (location.hash === "#admin") openAdmin();
+        })();
+    </script>
+</body>
+
+</html>
